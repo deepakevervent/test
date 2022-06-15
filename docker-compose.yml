@@ -1,0 +1,46 @@
+version: '3'
+services:
+    php:
+        # image: 'php:7.2-fpm'
+        build:
+            context: ./php
+            dockerfile: php.Dockerfile
+        container_name: ${APP_NAME:?err}-php
+        volumes:
+            - './app:/var/www/html'
+        depends_on:
+            - mysql
+
+    nginx:
+        image: nginx:latest
+        container_name: ${APP_NAME:?err}-nginx
+        ports:
+            - '80:80'
+            - '443:443'
+        links:
+            - 'php'
+        volumes:
+            - './app:/var/www/html'
+            - './config/nginx:/etc/nginx/conf.d'
+    mysql:
+        image: mysql:8.0.0
+        container_name: ${APP_NAME:?err}-mysql
+        restart: 'on-failure'
+        volumes:
+               - ./db-data:/var/lib/mysql
+        environment:
+            MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?err}
+        volumes:
+            - ${PWD}
+    phpmyadmin:
+        image: 'phpmyadmin/phpmyadmin'
+        restart: always
+        ports:
+            - '8000:80'
+        links:
+            - mysql:mysql
+        environment:
+                MYSQL_USERNAME: root
+                MYSQL_ROOT_PASSWORD: Admin@1234
+                PMA_HOST: mysql
+
