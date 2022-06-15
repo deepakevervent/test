@@ -10,7 +10,7 @@ services:
             - './app:/var/www/html'
         depends_on:
             - mysql
-
+Helloworld
     nginx:
         image: nginx:latest
         container_name: ${APP_NAME:?err}-nginx
